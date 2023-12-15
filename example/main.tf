@@ -2,7 +2,6 @@ resource "aws_instance" "example" {
   count = 2
   ami           = "ami-06791f9213cbb608b" # Amazon Linux 2 AMI ID
   instance_type = "t2.micro"
-  security_groups = "sg-0f8c32d56a8691587"
   subnet_id     = "	subnet-0b3fd8cdc676642fb" # Use the appropriate subnet
   user_data     = <<-EOF
               #!/bin/bash
