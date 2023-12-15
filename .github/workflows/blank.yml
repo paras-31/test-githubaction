@@ -36,15 +36,7 @@ jobs:
         run: |
           cd example
           terraform init
-
-      - name: terraform plan
-        run: | 
-          cd example 
           terraform plan
-
-      - name: apply 
-        run: | 
-          cd example
           terraform apply -auto-approve
 
   wait_for_instances:
