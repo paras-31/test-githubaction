@@ -61,15 +61,21 @@ jobs:
       - name: Wait for Instances to be ready
         run: |
           while true; do
-            instances=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].InstanceId' --output text)
+            instances=$(aws ec2 describe-instances \
+              --filters "Name=instance-state-name,Values=running" \
+              --query 'Reservations[*].Instances[*].{Instance:InstanceId,StatusChecks:StatusChecks[0].Status}' \
+              --output json)
+
             echo "Instances: $instances"
-            
-            if [ -n "$instances" ]; then
-              echo "Instances are ready!"
+
+            # Check if instances and both status checks passed
+            if [ -n "$instances" ] && [ "$(echo "$instances" | jq '.[].StatusChecks')" == '[{"Status":"ok"},{"Status":"ok"}]' ]; then
+              echo "Instances and status checks are ready!"
               break
             else
-              echo "Waiting for instances to be ready..."
+              echo "Waiting for instances and status checks to be ready..."
               sleep 10
             fi
           done
+
 
