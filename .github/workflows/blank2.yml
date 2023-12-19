@@ -39,8 +39,10 @@ jobs:
           # Run the AWS CLI command to describe instances and output JSON
           instances_json=$(aws ec2 describe-instances \
             --filters "Name=instance-state-name,Values=running" \
-            --query 'Reservations[*].Instances[*].{Instance:InstanceId,StatusChecks:StatusChecks}' \
+            --query 'Reservations[*].Instances[*].{Instance:InstanceId,StatusChecks:StatusChecks[0].Status}' \
             --output json)
 
+          status = $(aws ec2 describe-instances --filters "Name=instance-state-name , Values=running" --query 'Reservations[*].Instances[*].StatusChecks')
+          echo "fetched data": $status"
           # Print the raw output for debugging
           echo "Raw Output: $instances_json"
