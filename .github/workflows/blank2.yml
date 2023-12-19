@@ -39,11 +39,8 @@ jobs:
           # Run the AWS CLI command to describe instances and output JSON
           instances_json=$(aws ec2 describe-instances \
             --filters "Name=instance-state-name,Values=running" \
-            --query 'Reservations[*].Instances[*].{Instance:InstanceId,StatusChecks:StatusChecks[0].Status}' \
+            --query 'Reservations[*].Instances[*].{Instance:InstanceId,StatusChecks:StatusChecks}' \
             --output json)
 
-          # Print the JSON output
-          echo "Instances: $instances_json"
-
-          # Set the JSON output as an environment variable for use in subsequent steps
-          # echo "INSTANCES_JSON=$instances_json" >> $GITHUB_ENV
+          # Print the raw output for debugging
+          echo "Raw Output: $instances_json"
