@@ -60,22 +60,32 @@ jobs:
 
       - name: Wait for Instances to be ready
         run: |
-          while true; do
-            instances=$(aws ec2 describe-instances \
-              --filters "Name=instance-state-name,Values=running" \
-              --query 'Reservations[*].Instances[*].{Instance:InstanceId,StatusChecks:StatusChecks[0].Status}' \
-              --output json)
+          instances=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].{Instance:InstanceId}' --output json)
+          instance_ids=($(echo "$instances" | jq -r '.[][] | .Instance'))  
+          
+          # while condition sceniro
 
-            echo "Instances: $instances"
+          for instance_id in "${instance_ids[@]}"; do
+              echo "Instance ID: $instance_id"
+              
+              # Initialize the 'status' variable
+              status=""
 
-            # Check if instances and both status checks passed
-            if [ -n "$instances" ] && [ "$(echo "$instances" | jq '.[].StatusChecks')" == '[{"Status":"ok"},{"Status":"ok"}]' ]; then
-              echo "Instances and status checks are ready!"
-              break
-            else
-              echo "Waiting for instances and status checks to be ready..."
-              sleep 10
-            fi
+              # Keep checking the status until it becomes "ok"
+              while [ "$status" != "ok" ]; do
+                  # Store the result in the 'status' variable
+                  status=$(aws ec2 describe-instance-status --instance-ids $instance_id --query 'InstanceStatuses[0].InstanceStatus.Status' --output text)
+
+                  # Check if the status is not "ok"
+                  if [ "$status" != "ok" ]; then
+                      echo "Status is not 'ok'. Waiting for status to become 'ok'..."
+                      sleep 10  # Adjust the sleep duration as needed
+                  fi
+              done
+
+              # Echo the final status
+              echo "Final Status: $status"
           done
+
 
 
