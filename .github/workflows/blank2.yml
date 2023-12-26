@@ -38,12 +38,16 @@ jobs:
           terraform plan
           terraform apply -auto-approve
 
-      - run: ls
+      - run: | 
+          cd ec2
+          ls
+
+
 
       - name: uploading the index.htlm
         uses: actions/upload-artifact@v2
         with:
           name: tf-key-pair
           path: tf-key-pair
-          
+
       - run: ls
