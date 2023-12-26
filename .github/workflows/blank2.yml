@@ -48,17 +48,29 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: tf-key-pair
-          path: ec2/tf-key-pair123
+          path: ec2/tf-key-pair5
 
   build2:
     needs: terraform_actions
     runs-on: ubuntu-latest
     steps:
-      - run: ls
+      - name: CheckOut
+        uses: actions/checkout@v3
+      - name: set up terraform hasicrop
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.1.7
       - name: Download the key-pair-file
         uses: actions/download-artifact@v2
         with:
           name: tf-key-pair
           
-      - run: ls
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y putty-tools
+          puttygen --version
+
+
+
+
       
