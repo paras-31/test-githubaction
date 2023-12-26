@@ -41,7 +41,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: tf-key-pair
-          path: ec2/tf-key-pair6
+          path: ec2/tf-key-pair61
 
   build2:
     needs: terraform_actions
@@ -63,7 +63,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y putty-tools
           puttygen --version
-          puttygen tf-key-pair6 -O private -o tf-key-pair6.ppk
+          puttygen tf-key-pair61 -O private -o tf-key-pair61.ppk
+          ls
 
 
 
