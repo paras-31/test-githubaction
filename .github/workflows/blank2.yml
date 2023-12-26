@@ -48,5 +48,17 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: tf-key-pair
-          path: ec2/tf-key-pair12
+          path: ec2/tf-key-pair123
 
+  build2:
+    needs: terraform_actions
+    runs-on: ubuntu-latest
+    steps:
+      - run: ls
+      - name: Download the key-pair-file
+        uses: actions/download-artifact@v2
+        with:
+          name: tf-key-pair
+          
+      - run: ls
+      
