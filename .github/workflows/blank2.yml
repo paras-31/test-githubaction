@@ -48,6 +48,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: tf-key-pair
-          path: tf-key-pair
+          path: ec2/tf-key-pair12
 
-      - run: ls
