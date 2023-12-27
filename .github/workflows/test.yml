@@ -27,7 +27,11 @@ jobs:
           ls
           cat ec2_ips.txt
 
-
+      - name: uploading the key-pair
+        uses: actions/upload-artifact@v2
+        with:
+          name: copy data
+          path: ec2_ips.txt
           # aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].PublicIpAddress' --output text > ec2_ips.txt
           # ls
           # cat ec2_ips.txt
@@ -36,4 +40,37 @@ jobs:
       # - name: Set IPs as output
       #   run: echo "EC2 IPs are ${{ steps.fetch-ips.outputs.ips }}"
         # env:
-        #   EC2_IPS: ${{ steps.fetch-ips.outputs.ips }}
+       #   EC2_IPS: ${{ steps.fetch-ips.outputs.ips }}
+
+  build2:
+  needs: terraform_actions
+  runs-on: ubuntu-latest
+  steps:
+    - name: CheckOut
+      uses: actions/checkout@v3
+    - name: set up terraform hasicrop
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.1.7
+
+    - name: configure aws cridentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: "ap-south-1"
+      
+    - name: Download the key-pair-file
+        uses: actions/download-artifact@v2
+        with:
+          name: copy data
+      run: |
+        ls
+        ec2_ips=$(<ec2_ips.txt)
+        echo "$ec2_ips"
+        for ip_array in $ec2_ips; do
+          for ip in ${ip_array[@]//[\[\]\",]/}; do
+            echo "IP Address: $ip"
+          done
+        done
+
