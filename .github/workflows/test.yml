@@ -21,12 +21,19 @@ jobs:
       - name: Fetch EC2 IPs
         id: fetch-ips
         run: |
-          aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].PublicIpAddress' --output text > ec2_ips.txt
+          instances=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].PublicIpAddress')
+          echo $instances
+          echo $instances > ec2_ips.txt
           ls
           cat ec2_ips.txt
-          echo "::set-output name=ips::$(cat ec2_ips.txt)"
+
+
+          # aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].PublicIpAddress' --output text > ec2_ips.txt
+          # ls
+          # cat ec2_ips.txt
+          # echo "::set-output name=ips::$(cat ec2_ips.txt)"
     
-      - name: Set IPs as output
-        run: echo "EC2 IPs are ${{ steps.fetch-ips.outputs.ips }}"
+      # - name: Set IPs as output
+      #   run: echo "EC2 IPs are ${{ steps.fetch-ips.outputs.ips }}"
         # env:
         #   EC2_IPS: ${{ steps.fetch-ips.outputs.ips }}
