@@ -43,7 +43,7 @@ jobs:
        #   EC2_IPS: ${{ steps.fetch-ips.outputs.ips }}
 
   build2:
-  needs: terraform_actions
+  needs: fetch-ec2-ips
   runs-on: ubuntu-latest
   steps:
     - name: CheckOut
