@@ -70,9 +70,9 @@ jobs:
       - name: Extract EC2 IPs
         run: |
           IPS=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].{Instance:InstanceId}' --output json)
-          instance_ids=($(echo "$instances" | jq -r '.[][] | .Instance')) 
+          instance_ids=($(echo "$IPS" | jq -r '.[][] | .Instance')) 
           echo "$instance_ids"
-          echo "IPS=$instance_ids" >> $GITHUB_ENV
+          echo "instance_ids=$instance_ids" >> $GITHUB_ENV
 
   deploy_to_ec2:
     needs: build2
@@ -80,7 +80,7 @@ jobs:
     steps:
       - name: Use EC2 IPs
         run: |
-          echo "EC2 IP addresses are $IPS"
+          echo "EC2 IP addresses are $instance_ids"
 
         
 
