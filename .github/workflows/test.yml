@@ -1,6 +1,7 @@
 name: testing
 
 on:
+  workflow_dispatch:
   # ... your existing triggers
 
 jobs:
