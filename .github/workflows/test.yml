@@ -35,7 +35,7 @@ jobs:
             IPS="$IPS $IP"
           done
           # Store IPs as a GitHub variable
-          echo "{ips}={$IPS}" >> $GITHUB_OUTPUT
+          echo "::set-env name=ECS_INSTANCE_IPS::$IPS"
           # echo "::set-output name=ips::$IPS"
       - name: display ips
         run: |
