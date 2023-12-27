@@ -19,7 +19,6 @@ jobs:
           aws-region: "ap-south-1"
 
       - name: Fetch EC2 IPs
-        id: fetch-ips
         run: |
           instances=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].PublicIpAddress')
           echo $instances
@@ -64,7 +63,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: copy data
-          
+
       - name: Process EC2 IPs
         run: |
           ls
@@ -73,5 +72,6 @@ jobs:
           for ip_array in $ec2_ips; do
             for ip in ${ip_array[@]//[\[\]\",]/}; do
               echo "IP Address: $ip"
+              ssh -i ec2_private_key.pem ec2-user@$ip
             done
           done
