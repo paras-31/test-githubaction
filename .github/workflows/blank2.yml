@@ -44,7 +44,7 @@ jobs:
           path: ec2/tf-key-pair8
 
   build2:
-    # needs: terraform_actions
+    needs: terraform_actions
     runs-on: ubuntu-latest
     steps:
       - name: CheckOut
@@ -61,12 +61,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: "ap-south-1"
 
-      # - name: Download the key-pair-file
-      #   uses: actions/download-artifact@v2
-      #   with:
-      #     name: tf-key-pair
+      - name: Download the key-pair-file
+        uses: actions/download-artifact@v2
+        with:
+          name: tf-key-pair
 
-      # - run: ls
+      - run: ls
       - name: Extract EC2 IPs
         run: |
           IPS=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].{Instance:InstanceId}' --output json)
