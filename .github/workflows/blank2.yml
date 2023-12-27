@@ -46,6 +46,9 @@ jobs:
   build2:
     needs: terraform_actions
     runs-on: ubuntu-latest
+    outputs:
+      env:
+        IPS: ${{ steps.fetch_ips.outputs.ips }}
     steps:
       - name: CheckOut
         uses: actions/checkout@v3
@@ -68,11 +71,12 @@ jobs:
 
       - run: ls
       - name: Fetch EC2 instance IPs
+        id: fetch_ips
         run: |
           ips=$(aws ec2 describe-instances \
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
             --output text)
-          echo "::set-output name=ips::$ips"
+          echo "IPS=$ips" >> $GITHUB_ENV
 
   deploy_to_ec2:
     needs: build2
@@ -80,8 +84,7 @@ jobs:
     steps:
       - name: Retrieve EC2 instance IPs
         run: |
-          ips="${{ needs.terraform_actions.outputs.ips }}"
-          echo "Retrieved IPs: $ips"
+          echo "Retrieved IPs: $IPS"
 
         
 
