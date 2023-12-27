@@ -61,9 +61,9 @@ jobs:
         aws-region: "ap-south-1"
       
     - name: Download the key-pair-file
-        uses: actions/download-artifact@v2
-        with:
-          name: copy data
+      uses: actions/download-artifact@v2
+      with:
+        name: copy data
       run: |
         ls
         ec2_ips=$(<ec2_ips.txt)
