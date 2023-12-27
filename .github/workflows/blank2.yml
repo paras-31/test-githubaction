@@ -41,7 +41,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: tf-key-pair
-          path: ec2/tf-key-pair61
+          path: ec2/tf-key-pair7
 
   build2:
     needs: terraform_actions
@@ -53,18 +53,58 @@ jobs:
         uses: hashicorp/setup-terraform@v1
         with:
           terraform_version: 1.1.7
+
+      - name: configure aws cridentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "ap-south-1"
+
       - name: Download the key-pair-file
         uses: actions/download-artifact@v2
         with:
           name: tf-key-pair
+
+      - run: ls
+      - name: Fetch EC2 instance IPs
+        run: |
+          aws ec2 describe-instances \
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            --output text \
+            | head -n 5 > instance-ips.txt
+            ls
+
+  connect-to-instances:
+    needs: build2  # Ensure fetch-ips job runs first
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ip: ${{ fromJson(file('instance-ips.txt')) }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Connect to EC2 instance
+        run: |
+          # Use the IP address from the matrix to connect to the instance
+          # e.g., run commands using SSH or other tools
+          echo "Connecting to instance with IP: ${{ matrix.ip }}"
+
+        
+
           
-      - run: |
-          ls
-          sudo apt-get update
-          sudo apt-get install -y putty-tools
-          puttygen --version
-          puttygen tf-key-pair61 -O private -o tf-key-pair61.ppk
-          ls
+      # - run: |
+      #     ls
+      #     sudo apt-get update
+      #     sudo apt-get install -y putty-tools
+      #     puttygen --version
+      #     puttygen tf-key-pair61 -O private -o tf-key-pair61.ppk
+      #     ls
+
+      # - name: uploading the key-pair
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: .ppk file
+      #     path: tf-key-pair61.ppk
 
 
 
