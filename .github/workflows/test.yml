@@ -42,7 +42,7 @@ jobs:
         # env:
        #   EC2_IPS: ${{ steps.fetch-ips.outputs.ips }}
 
-   build2:
+  build2:
     needs: fetch-ec2-ips
     runs-on: ubuntu-latest
     steps:
