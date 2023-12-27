@@ -41,7 +41,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: tf-key-pair
-          path: ec2/tf-key-pair7
+          path: ec2/tf-key-pair71
 
   build2:
     needs: terraform_actions
@@ -75,7 +75,7 @@ jobs:
           echo "::set-output name=ips::$ips"
 
   deploy_to_ec2:
-    needs: terraform_actions
+    needs: build2
     runs-on: ubuntu-latest
     steps:
       - name: Retrieve EC2 instance IPs
