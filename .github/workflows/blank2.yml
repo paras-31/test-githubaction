@@ -6,12 +6,9 @@ on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   # push:
   #   branches: [ "main" ]
-  outputs:
-      env:
-        IPS: ${{ steps.fetch_ips.outputs.ips }}
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -70,21 +67,19 @@ jobs:
           name: tf-key-pair
 
       - run: ls
-      - name: Fetch EC2 instance IPs
-        id: fetch_ips
+      - name: Extract EC2 IPs
         run: |
-          ips=$(aws ec2 describe-instances \
-            --query 'Reservations[*].Instances[*].PublicIpAddress' \
-            --output text)
-          echo "IPS=$ips" >> $GITHUB_ENV
+          IPS=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].PublicIpAddress' --output text | tr '\t' '\n')
+          echo "$IPS"
+          echo "IPS=$IPS" >> $GITHUB_ENV
 
   deploy_to_ec2:
     needs: build2
     runs-on: ubuntu-latest
     steps:
-      - name: Retrieve EC2 instance IPs
+      - name: Use EC2 IPs
         run: |
-          echo "Retrieved IPs: $IPS"
+          echo "EC2 IP addresses are $IPS"
 
         
 
