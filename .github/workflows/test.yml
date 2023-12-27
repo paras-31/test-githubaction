@@ -22,12 +22,11 @@ jobs:
         id: fetch-ips
         run: |
           aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].PublicIpAddress' --output text > ec2_ips.txt
+          ls
+          cat ec2_ips.txt
           echo "::set-output name=ips::$(cat ec2_ips.txt)"
     
       - name: Set IPs as output
-        run: |
-          for ip in ${{ steps.fetch-ips.outputs.ips }}; do
-            echo "EC2 IP: $ip"
-          done  # This step is just for confirmation, you can remove it if not needed
-        env:
-          EC2_IPS: ${{ steps.fetch-ips.outputs.ips }}
+        run: echo "EC2 IPs are ${{ steps.fetch-ips.outputs.ips }}"
+        # env:
+        #   EC2_IPS: ${{ steps.fetch-ips.outputs.ips }}
