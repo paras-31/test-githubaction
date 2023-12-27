@@ -64,6 +64,8 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: copy data
+          
+      - name: Process EC2 IPs
         run: |
           ls
           ec2_ips=$(<ec2_ips.txt)
