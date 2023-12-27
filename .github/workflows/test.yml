@@ -25,6 +25,9 @@ jobs:
           echo "::set-output name=ips::$(cat ec2_ips.txt)"
     
       - name: Set IPs as output
-        run: echo "EC2 IPs are ${{ steps.fetch-ips.outputs.ips }}"  # This step is just for confirmation, you can remove it if not needed
+        run: |
+          for ip in ${{ steps.fetch-ips.outputs.ips }}; do
+            echo "EC2 IP: $ip"
+          done  # This step is just for confirmation, you can remove it if not needed
         env:
           EC2_IPS: ${{ steps.fetch-ips.outputs.ips }}
