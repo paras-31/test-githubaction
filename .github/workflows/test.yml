@@ -1,48 +1,41 @@
 name: testing
 
 on:
-  workflow_dispatch:
+  # ... your existing triggers
 
 jobs:
   terraform_actions:
     name: terraform
     runs-on: ubuntu-latest
-    outputs:
-      # Declare the output variable to store the EC2 IPs
-      id: ec2_ips
     steps:
       - name: CheckOut
         uses: actions/checkout@v3
-      - name: set up terraform hasicorp
+      - name: set up terraform hasicrop
         uses: hashicorp/setup-terraform@v1
         with:
           terraform_version: 1.1.7
-
-      - name: configure aws credentials
+      - name: configure aws cridentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: "ap-south-1"
-
       - name: terraform init
-        run: terraform init
-
-      - name: Get EC2 IPs
-        id: get_ec2_ips
         run: |
-          # Run Terraform commands to get the EC2 IPs
-          ec2_ips=$(terraform output -json ec2_ips)
-          echo "::set-output name=ec2_ips::$ec2_ips"
-
-# Define a new job to use the EC2 IPs
-  display_ips:
-    name: Display EC2 IPs
-    runs-on: ubuntu-latest
-    needs: terraform_actions
-    steps:
-      - name: Display IPs
+          terraform init
+      - name: fetch instance ips
         run: |
-          # Access the output variable from the previous job
-          ec2_ips="${{ needs.terraform_actions.outputs.ec2_ips }}"
-          echo "EC2 IPs: $ec2_ips"
+          # Use AWS CLI to list instance IDs
+          INSTANCE_IDS=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].InstanceId' --output text)
+          # Fetch IP addresses for each instance
+          IPS=""
+          for INSTANCE_ID in $INSTANCE_IDS; do
+            IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+            IPS="$IPS $IP"
+          done
+          # Store IPs as a GitHub variable
+          echo "::set-output name=ips::$IPS"
+      - name: display ips
+        run: |
+          # Access the stored IPs from the previous step
+          echo "Instance IPs: ${{ steps.fetch_instance_ips.outputs.ips }}"
