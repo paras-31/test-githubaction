@@ -16,6 +16,9 @@ jobs:
   terraform_actions:
     name: terraform
     runs-on: ubuntu-latest
+    outputs:
+      env:
+        IPS: ${{ steps.fetch_ips.outputs.ips }}
     steps:
       - name: CheckOut
         uses: actions/checkout@v3
@@ -41,14 +44,11 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: tf-key-pair
-          path: ec2/tf-key-pair71
+          path: ec2/tf-key-pair8
 
   build2:
-    # needs: terraform_actions
+    needs: terraform_actions
     runs-on: ubuntu-latest
-    outputs:
-      env:
-        IPS: ${{ steps.fetch_ips.outputs.ips }}
     steps:
       - name: CheckOut
         uses: actions/checkout@v3
