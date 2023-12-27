@@ -1,43 +1,30 @@
-name: testing
+name: fetch-ec2-ips
 
 on:
   workflow_dispatch:
-  # ... your existing triggers
-
+  
 jobs:
-  terraform_actions:
-    name: terraform
+  fetch-ec2-ips:
+    name: Fetch EC2 IPs
     runs-on: ubuntu-latest
     steps:
-      - name: CheckOut
-        uses: actions/checkout@v3
-      - name: set up terraform hasicrop
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.1.7
-      - name: configure aws cridentials
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: "ap-south-1"
-      - name: terraform init
+
+      - name: Fetch EC2 IPs
+        id: fetch-ips
         run: |
-          terraform init
-      - name: fetch instance ips
-        run: |
-          # Use AWS CLI to list instance IDs
-          INSTANCE_IDS=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].InstanceId' --output text)
-          # Fetch IP addresses for each instance
-          IPS=""
-          for INSTANCE_ID in $INSTANCE_IDS; do
-            IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
-            IPS="$IPS $IP"
-          done
-          # Store IPs as a GitHub variable
-          echo "::set-env name=ECS_INSTANCE_IPS::$IPS"
-          # echo "::set-output name=ips::$IPS"
-      - name: display ips
-        run: |
-          # Access the stored IPs from the previous step
-          echo "Instance IPs: ${{ steps.fetch_instance_ips.outputs.ips }}"
+          aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text > ec2_ips.txt
+          echo "::set-output name=ips::$(cat ec2_ips.txt)"
+    
+      - name: Set IPs as output
+        run: echo "EC2 IPs are ${{ steps.fetch-ips.outputs.ips }}"  # This step is just for confirmation, you can remove it if not needed
+        env:
+          EC2_IPS: ${{ steps.fetch-ips.outputs.ips }}
