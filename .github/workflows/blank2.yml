@@ -69,25 +69,19 @@ jobs:
       - run: ls
       - name: Fetch EC2 instance IPs
         run: |
-          aws ec2 describe-instances \
+          ips=$(aws ec2 describe-instances \
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
-            --output text \
-            | head -n 5 > instance-ips.txt
-            ls
+            --output text)
+          echo "::set-output name=ips::$ips"
 
-  connect-to-instances:
-    needs: build2  # Ensure fetch-ips job runs first
+  deploy_to_ec2:
+    needs: terraform_actions
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        ip: ${{ fromJson(file('instance-ips.txt')) }}
     steps:
-      - uses: actions/checkout@v3
-      - name: Connect to EC2 instance
+      - name: Retrieve EC2 instance IPs
         run: |
-          # Use the IP address from the matrix to connect to the instance
-          # e.g., run commands using SSH or other tools
-          echo "Connecting to instance with IP: ${{ matrix.ip }}"
+          ips="${{ needs.terraform_actions.outputs.ips }}"
+          echo "Retrieved IPs: $ips"
 
         
 
