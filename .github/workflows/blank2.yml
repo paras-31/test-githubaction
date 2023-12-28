@@ -31,8 +31,8 @@ jobs:
       - name: uploading the key-pair
         uses: actions/upload-artifact@v2
         with:
-          name: tf-key-pair93
-          path: ec2/tf-key-pair93
+          name: tf-key-pair94
+          path: ec2/tf-key-pair94
 
   build2:
     needs: terraform_actions
@@ -87,7 +87,7 @@ jobs:
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: tf-key-pair93
+          name: tf-key-pair94
       - name: Download2
         uses: actions/download-artifact@v2
         with:
@@ -101,7 +101,8 @@ jobs:
           for ip_array in $ec2_ips; do
             for ip in ${ip_array[@]//[\[\]\",]/}; do
               echo "IP Address: $ip"
-              ssh -o StrictHostKeyChecking=no -i tf-key-pair93 ec2-user@$ip
+              chmod 600 tf-key-pair94
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair94 ec2-user@$ip "your_command_here"
             done
           done
 
