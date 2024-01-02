@@ -41,8 +41,8 @@ jobs:
       - name: uploading the key-pair
         uses: actions/upload-artifact@v2
         with:
-          name: tf-key-pair15
-          path: ec2/tf-key-pair15
+          name: tf-key-pair969
+          path: ec2/tf-key-pair969
 
   # wait_for_instances:
   #   name: Wait for Instances
@@ -144,7 +144,7 @@ jobs:
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: tf-key-pair15
+          name: tf-key-pair969
       - name: Download2
         uses: actions/download-artifact@v2
         with:
@@ -155,7 +155,7 @@ jobs:
           ls
           ec2_ips=$(<ec2_ips.txt)
           echo "$ec2_ips"
-          chmod 400 tf-key-pair15
+          chmod 400 tf-key-pair969
           # for ip_array in $ec2_ips; do
           #   for ip in ${ip_array[@]//[\[\]\",]/}; do
           #     echo "IP Address: $ip"
