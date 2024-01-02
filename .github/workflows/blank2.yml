@@ -34,8 +34,8 @@ jobs:
       - name: uploading the key-pair
         uses: actions/upload-artifact@v2
         with:
-          name: tf-key-pair89815
-          path: ec2/tf-key-pair89815
+          name: tf-key-pair89816
+          path: ec2/tf-key-pair89816
 
   wait_for_instances:
     name: Wait for Instances
@@ -138,7 +138,7 @@ jobs:
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: tf-key-pair89815
+          name: tf-key-pair89816
       - name: Download2
         uses: actions/download-artifact@v2
         with:
@@ -149,22 +149,22 @@ jobs:
           ls
           ec2_ips=$(<ec2_ips.txt)
           echo "$ec2_ips"
-          chmod 400 tf-key-pair89815
+          chmod 400 tf-key-pair89816
           for ip_array in $ec2_ips; do
             for ip in ${ip_array[@]//[\[\]\",]/}; do
               echo "IP Address: $ip"
-              ssh -o StrictHostKeyChecking=no -i tf-key-pair89815 ec2-user@$ip "sudo su"
-              ssh -o StrictHostKeyChecking=no -i tf-key-pair89815 ec2-user@$ip "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash"
-              ssh -o StrictHostKeyChecking=no -i tf-key-pair89815 ec2-user@$ip ". ~/.bashrc"
-              ssh -o StrictHostKeyChecking=no -i tf-key-pair89815 ec2-user@$ip "nvm install 14"
-              ssh -o StrictHostKeyChecking=no -i tf-key-pair89815 ec2-user@$ip "nvm use 14"
-              ssh -o StrictHostKeyChecking=no -i tf-key-pair89815 ec2-user@$ip "sudo yum install git -y"  # For Amazon Linux
-              ssh -o StrictHostKeyChecking=no -i tf-key-pair89815 ec2-user@$ip "git clone https://github.com/paras-31/latest-hungry-withbackend-project.git"
-              ssh -o StrictHostKeyChecking=no -i tf-key-pair89815 ec2-user@$ip "ls"
-              ssh -o StrictHostKeyChecking=no -i tf-key-pair89815 ec2-user@$ip "cd latest-hungry-withbackend-project"
-              ssh -o StrictHostKeyChecking=no -i tf-key-pair89815 ec2-user@$ip "ls"
-              ssh -o StrictHostKeyChecking=no -i tf-key-pair89815 ec2-user@$ip "npm install"
-              ssh -o StrictHostKeyChecking=no -i tf-key-pair89815 ec2-user@$ip "npm start"
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair89816 ec2-user@$ip "sudo su"
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair89816 ec2-user@$ip "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash"
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair89816 ec2-user@$ip ". ~/.bashrc"
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair89816 ec2-user@$ip "nvm install 14"
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair89816 ec2-user@$ip "nvm use 14"
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair89816 ec2-user@$ip "sudo yum install git -y"  # For Amazon Linux
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair89816 ec2-user@$ip "git clone https://github.com/paras-31/latest-hungry-withbackend-project.git"
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair89816 ec2-user@$ip "ls"
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair89816 ec2-user@$ip "cd latest-hungry-withbackend-project && npm install
+              # ssh -o StrictHostKeyChecking=no -i tf-key-pair89815 ec2-user@$ip "ls"
+              # ssh -o StrictHostKeyChecking=no -i tf-key-pair89815 ec2-user@$ip "npm install"
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair89816 ec2-user@$ip "npm start"
             done
           done
 
