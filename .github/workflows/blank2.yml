@@ -24,7 +24,7 @@ jobs:
 
       - name: terraform init
         run: |
-          cd example
+          cd ec2
           terraform init
           terraform plan
           terraform apply -auto-approve
