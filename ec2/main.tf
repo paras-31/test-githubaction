@@ -17,6 +17,7 @@ resource "aws_instance" "example" {
   instance_type               = "t2.micro"
   subnet_id                   = "subnet-0b3fd8cdc676642fb" # Use the appropriate subnet
   associate_public_ip_address = true
+  #security_groups = [""]
   #   key_name                    = "tf-key-pair"
   key_name = aws_key_pair.tf-key-pair.key_name
 

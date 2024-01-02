@@ -5,8 +5,8 @@ name: CI
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
-  # push:
-  #   branches: [ "main" ]
+  push:
+    branches: [ "main" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -38,6 +38,11 @@ jobs:
           terraform init
           terraform plan
           terraform apply -auto-approve
+      - name: uploading the key-pair
+        uses: actions/upload-artifact@v2
+        with:
+          name: tf-key-pair98
+          path: ec2/tf-key-pair98
 
   wait_for_instances:
     name: Wait for Instances
@@ -86,6 +91,89 @@ jobs:
               # Echo the final status
               echo "Final Status: $status"
           done
+  fetch_running_inst:
+    needs: wait_for_instances
+    runs-on: ubuntu-latest
+    steps:
+      - name: CheckOut
+        uses: actions/checkout@v3
+      - name: set up terraform hasicrop
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.1.7
+
+      - name: configure aws cridentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "ap-south-1"
+
+      - name: Fetch EC2 IPs
+        run: |
+          ls
+          instances=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].PublicIpAddress')
+          echo $instances
+          echo $instances > ec2_ips.txt
+          ls
+          cat ec2_ips.txt
+
+      - name: uploading the data
+        uses: actions/upload-artifact@v2
+        with:
+          name: copy data
+          path: ec2_ips.txt
+
+  scripts:
+    needs: fetch_running_inst
+    runs-on: ubuntu-latest
+    steps:
+      - name: CheckOut
+        uses: actions/checkout@v3
+      - name: set up terraform hasicrop
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.1.7
+
+      - name: configure aws cridentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "ap-south-1"
+      - name: Download
+        uses: actions/download-artifact@v2
+        with:
+          name: tf-key-pair98
+      - name: Download2
+        uses: actions/download-artifact@v2
+        with:
+          name: copy data
+
+      - name: connection
+        run: |
+          ls
+          ec2_ips=$(<ec2_ips.txt)
+          echo "$ec2_ips"
+          chmod 400 tf-key-pair98
+          for ip_array in $ec2_ips; do
+            for ip in ${ip_array[@]//[\[\]\",]/}; do
+              echo "IP Address: $ip"
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair98 ec2-user@$ip "sudo su"
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair98 ec2-user@$ip "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash"
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair98 ec2-user@$ip ". ~/.bashrc"
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair98 ec2-user@$ip "nvm install 14"
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair98 ec2-user@$ip "nvm use 14"
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair98 ec2-user@$ip "sudo yum install git -y"  # For Amazon Linux
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair98 ec2-user@$ip "git clone https://github.com/paras-31/latest-hungry-withbackend-project.git"
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair98 ec2-user@$ip "ls"
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair98 ec2-user@$ip "cd latest-hungry-withbackend-project"
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair98 ec2-user@$ip "npm install"
+              ssh -o StrictHostKeyChecking=no -i tf-key-pair98 ec2-user@$ip "npm start"
+            done
+          done
+
+  
 
 
 
