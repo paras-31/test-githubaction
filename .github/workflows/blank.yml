@@ -41,8 +41,8 @@ jobs:
       - name: uploading the key-pair
         uses: actions/upload-artifact@v2
         with:
-          name: tf-file
-          path: ec2/tf-key-pair11
+          name: tf-key-pair12
+          path: ec2/tf-key-pair12
 
   # wait_for_instances:
   #   name: Wait for Instances
@@ -144,7 +144,7 @@ jobs:
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: tf-file
+          name: tf-key-pair12
       - name: Download2
         uses: actions/download-artifact@v2
         with:
