@@ -1,6 +1,6 @@
 
 resource "aws_key_pair" "tf-key-pair" {
-  key_name   = "tf-key-pair89818"
+  key_name   = "tf-key-pair89819"
   public_key = tls_private_key.rsa.public_key_openssh
 }
 resource "tls_private_key" "rsa" {
@@ -9,7 +9,7 @@ resource "tls_private_key" "rsa" {
 }
 resource "local_file" "tf-key" {
   content  = tls_private_key.rsa.private_key_pem
-  filename = "tf-key-pair89818"
+  filename = "tf-key-pair89819"
 }
 
 resource "aws_instance" "example" {
