@@ -31,8 +31,8 @@ jobs:
       - name: uploading the key-pair
         uses: actions/upload-artifact@v2
         with:
-          name: tf-key-pair10
-          path: ec2/tf-key-pair10
+          name: tf-key-pair11
+          path: ec2/tf-key-pair11
 
   build2:
     needs: terraform_actions
@@ -87,7 +87,7 @@ jobs:
       - name: Download
         uses: actions/download-artifact@v2
         with:
-          name: tf-key-pair10
+          name: tf-key-pair11
       - name: Download2
         uses: actions/download-artifact@v2
         with:
